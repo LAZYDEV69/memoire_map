@@ -4,10 +4,10 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Patty's Memory Map</title>
-  <link rel="icon" type="image/x-icon" href="flower.png">
+<link rel="icon" type="image/x-icon" href="flower.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -16,15 +16,83 @@
   --shadow:0 4px 20px rgba(200,60,100,0.15);
 }
 body{font-family:'Lato',sans-serif;background:var(--cream);color:#3d1a26;height:100vh;overflow:hidden}
-#app{display:flex;flex-direction:column;height:100vh}
+
+/* ── AUTH SCREEN ─────────────────────────────── */
+#auth-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(160deg,#fce4ec 0%,#fff0f4 50%,#fce4ec 100%);
+  display:flex;align-items:center;justify-content:center;
+}
+#auth-screen::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 20% 20%,rgba(232,84,122,0.12) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 80%,rgba(192,48,96,0.10) 0%,transparent 60%);
+}
+.auth-floats{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.af{position:absolute;font-size:28px;animation:float-up 6s ease-in-out infinite;opacity:0.18}
+.af:nth-child(1){left:8%;animation-delay:0s;font-size:22px}
+.af:nth-child(2){left:22%;animation-delay:1.2s;font-size:32px}
+.af:nth-child(3){left:40%;animation-delay:0.6s;font-size:20px}
+.af:nth-child(4){left:60%;animation-delay:1.8s;font-size:28px}
+.af:nth-child(5){left:75%;animation-delay:0.3s;font-size:24px}
+.af:nth-child(6){left:90%;animation-delay:2.1s;font-size:18px}
+@keyframes float-up{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-18px) rotate(5deg)}}
+
+#auth-card{
+  position:relative;z-index:1;
+  background:#fff;border-radius:28px;
+  padding:48px 44px 40px;text-align:center;
+  border:2px solid var(--rose-light);
+  box-shadow:0 20px 60px rgba(200,60,100,0.18),0 4px 16px rgba(200,60,100,0.10);
+  max-width:400px;width:90%;
+}
+.auth-logo{font-size:52px;margin-bottom:4px;line-height:1}
+.auth-title{font-family:'Playfair Display',serif;font-size:28px;color:var(--rose-deep);margin-bottom:4px;font-weight:700}
+.auth-subtitle{font-size:13px;color:#9c4068;margin-bottom:32px;line-height:1.6;font-style:italic}
+.auth-divider{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.auth-divider span{font-size:11px;color:#c08090;white-space:nowrap}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--rose-light)}
+
+#btn-google{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;padding:14px 20px;
+  border:2px solid var(--rose-light);border-radius:14px;
+  background:#fff;cursor:pointer;
+  font-family:'Lato',sans-serif;font-size:15px;font-weight:700;color:#3d1a26;
+  transition:all .2s;margin-bottom:16px;
+  box-shadow:0 2px 8px rgba(200,60,100,0.08);
+}
+#btn-google:hover{background:var(--rose-pale);border-color:var(--rose);transform:translateY(-1px);box-shadow:0 4px 16px rgba(200,60,100,0.15)}
+#btn-google:active{transform:translateY(0)}
+#btn-google img{width:22px;height:22px}
+.auth-footer{font-size:11px;color:#c08090;line-height:1.7}
+.auth-footer strong{color:var(--mauve)}
+#auth-error{color:var(--rose);font-size:12px;margin-top:12px;display:none;padding:8px 12px;background:var(--rose-pale);border-radius:8px}
+
+/* ── LOADING SCREEN ─────────────────────────── */
+#loading-screen{
+  position:fixed;inset:0;z-index:9998;
+  background:var(--rose-pale);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+}
+.spinner{width:38px;height:38px;border:3px solid var(--rose-light);border-top-color:var(--rose);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading-screen p{font-family:'Playfair Display',serif;color:var(--rose-deep);font-size:16px}
+
+/* ── MAIN APP ───────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100vh;display:none}
 
 #header{background:linear-gradient(135deg,#e8547a,#c03060);padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 12px rgba(192,48,96,0.3)}
 #header h1{font-family:'Playfair Display',serif;color:#fff;font-size:20px;font-weight:700;letter-spacing:0.5px}
 #header p{color:rgba(255,255,255,0.85);font-size:12px;font-weight:300}
 .hdr-icon{font-size:24px}
 #stats{margin-left:auto;background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 14px;color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
+#user-badge{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.15);border-radius:20px;padding:3px 10px 3px 3px;margin-left:8px;flex-shrink:0}
+#user-avatar{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,0.6);object-fit:cover}
+#user-name{color:#fff;font-size:11px;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#btn-logout{background:rgba(255,255,255,0.2);border:none;border-radius:10px;color:#fff;font-size:10px;padding:3px 8px;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s}
+#btn-logout:hover{background:rgba(255,255,255,0.35)}
 
-/* SEARCH BAR */
 #search-bar{background:linear-gradient(135deg,#c03060,#9c2050);padding:8px 16px;display:flex;gap:8px;align-items:center;flex-shrink:0}
 #search-wrap{flex:1;position:relative}
 #search-input{width:100%;border:none;border-radius:22px;padding:8px 16px 8px 36px;font-family:'Lato',sans-serif;font-size:13px;color:#3d1a26;background:#fff;outline:none;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
@@ -32,7 +100,7 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:#3d1a26;height:
 .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
 #search-btn{background:rgba(255,255,255,0.25);border:1.5px solid rgba(255,255,255,0.5);border-radius:20px;color:#fff;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;white-space:nowrap;transition:background .2s}
 #search-btn:hover{background:rgba(255,255,255,0.4)}
-#search-results{position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(200,60,100,0.2);border:1.5px solid var(--rose-light);z-index:9999;overflow:hidden;display:none;max-height:220px;overflow-y:auto}
+#search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(200,60,100,0.2);border:1.5px solid var(--rose-light);z-index:9999;overflow:hidden;display:none;max-height:220px;overflow-y:auto}
 #search-results::-webkit-scrollbar{width:4px}
 #search-results::-webkit-scrollbar-thumb{background:var(--petal);border-radius:4px}
 .sr-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--rose-light);font-size:13px;color:#3d1a26;transition:background .15s;display:flex;align-items:flex-start;gap:8px}
@@ -41,8 +109,7 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:#3d1a26;height:
 .sr-item-icon{color:var(--rose);font-size:14px;margin-top:1px;flex-shrink:0}
 .sr-item-name{font-weight:700;font-size:13px;color:var(--rose-deep)}
 .sr-item-detail{font-size:11px;color:#9c4068;margin-top:1px}
-.sr-loading{padding:12px 14px;font-size:13px;color:#9c4068;text-align:center}
-.sr-none{padding:12px 14px;font-size:13px;color:#c08090;text-align:center}
+.sr-loading,.sr-none{padding:12px 14px;font-size:13px;color:#9c4068;text-align:center}
 
 #main{display:flex;flex:1;overflow:hidden}
 #map{flex:1;z-index:1}
@@ -50,7 +117,7 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:#3d1a26;height:
 #sb-head{background:linear-gradient(135deg,#fce4ec,#f9d0dc);padding:14px 16px;border-bottom:1px solid var(--rose-light)}
 #sb-head h2{font-family:'Playfair Display',serif;color:var(--rose-deep);font-size:16px}
 #sb-head p{color:#9c4068;font-size:11px;margin-top:2px}
-#add-form{padding:14px 16px;border-bottom:2px solid var(--rose-light);background:#fff9fb;flex-shrink:0}
+#add-form{padding:14px 16px;border-bottom:2px solid var(--rose-light);background:#fff9fb;flex-shrink:0;display:none}
 #add-form h3{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--rose);margin-bottom:10px;font-weight:700}
 .form-row{margin-bottom:8px}
 .form-row label{display:block;font-size:11px;color:var(--mauve);font-weight:700;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.8px}
@@ -91,13 +158,44 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:#3d1a26;height:
 .popup-story{font-size:12px;color:#6d3350;margin-top:5px;line-height:1.6}
 .popup-date{font-size:10px;color:#c08090;margin-top:6px;font-style:italic}
 #inst{background:linear-gradient(90deg,var(--rose-pale),var(--blush));border-top:1px solid var(--rose-light);padding:6px 16px;font-size:11px;color:var(--mauve);text-align:center;flex-shrink:0;font-weight:700;letter-spacing:0.3px}
-
-/* Search highlight ring on map */
-.search-ring{stroke:#e8547a;stroke-width:3;fill:rgba(232,84,122,0.1);animation:ring-pulse 1.5s ease-in-out infinite}
-@keyframes ring-pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 </style>
 </head>
 <body>
+
+<!-- LOADING -->
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <p>Loading your memories… 🌸</p>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-floats">
+    <span class="af" style="top:15%">🌸</span>
+    <span class="af" style="top:70%">🌷</span>
+    <span class="af" style="top:35%">✿</span>
+    <span class="af" style="top:55%">🌺</span>
+    <span class="af" style="top:20%">💮</span>
+    <span class="af" style="top:80%">🌸</span>
+  </div>
+  <div id="auth-card">
+    <div class="auth-logo">🗺️</div>
+    <h1 class="auth-title">Patty's Memory Map</h1>
+    <p class="auth-subtitle">Your most cherished places, pinned forever 💕</p>
+    <div class="auth-divider"><span>sign in to continue</span></div>
+    <button id="btn-google">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"/>
+      Continue with Google
+    </button>
+    <p class="auth-footer">
+      Only <strong>the owner</strong> can add or delete pins.<br>
+      Everyone else can view the map freely 🌸
+    </p>
+    <p id="auth-error"></p>
+  </div>
+</div>
+
+<!-- MAIN APP (hidden until signed in) -->
 <div id="app">
   <div id="header">
     <span class="hdr-icon">🗺️</span>
@@ -106,9 +204,13 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:#3d1a26;height:
       <p>Pin your most cherished places</p>
     </div>
     <div id="stats">0 memories</div>
+    <div id="user-badge">
+      <img id="user-avatar" src="" alt=""/>
+      <span id="user-name"></span>
+      <button id="btn-logout">Sign out</button>
+    </div>
   </div>
 
-  <!-- SEARCH BAR -->
   <div id="search-bar">
     <div id="search-wrap">
       <span class="search-icon">🔍</span>
@@ -123,9 +225,9 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:#3d1a26;height:
     <div id="sidebar">
       <div id="sb-head">
         <h2>🌸 My Places</h2>
-        <p>Click anywhere on the map to add a memory</p>
+        <p id="sb-sub">Click anywhere on the map to add a memory</p>
       </div>
-      <div id="add-form" style="display:none">
+      <div id="add-form">
         <h3>📍 New Memory</h3>
         <div class="form-row">
           <label>Place Name</label>
@@ -158,76 +260,57 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:#3d1a26;height:
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const pins=[];
-let pendingLatLng=null;
-let imgData=null;
-let tempMarker=null;
-let searchCircle=null;
-let searchDebounce=null;
 
-const map=L.map('map',{center:[20,10],zoom:2,zoomControl:true});
+<!-- ════════════════════════════════════════════════════════
+     STEP 1 — Paste your Firebase config below
+     STEP 2 — Set OWNER_EMAIL to your Gmail address
+════════════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp }           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+                                    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp }
+                                    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ⬇️ PASTE YOUR FIREBASE CONFIG HERE */
+const firebaseConfig = {
+  apiKey:            "AIzaSyAHRRdVwbbj0I6rmT3ghOaPSN12IiNE1IM",
+  authDomain:        "memoire-map1122.firebaseapp.com",
+  projectId:         "memoire-map1122",
+  storageBucket:     "memoire-map1122.firebasestorage.app",
+  messagingSenderId: "569088820440",
+  appId:             "1:569088820440:web:4e00cbcede08f5d64583ad"
+};
+
+/* ⬇️ ONLY this Gmail can add / delete pins */
+const OWNER_EMAIL = "patricianuylan.54@gmail.com";
+
+/* ════════ init ════════ */
+const fbApp   = initializeApp(firebaseConfig);
+const auth    = getAuth(fbApp);
+const db      = getFirestore(fbApp);
+const gProvider = new GoogleAuthProvider();
+
+let currentUser  = null;
+let pendingLatLng = null;
+let imgData       = null;
+let tempMarker    = null;
+let searchCircle  = null;
+let searchDebounce = null;
+const markerMap   = {};   // firestoreId → L.marker
+
+/* ════════ MAP ════════ */
+const map = L.map('map', {
+  center: [20, 10],
+  zoom: 2,
+  worldCopyJump: false,
+  maxBoundsViscosity: 1.0,
+  maxBounds: [[-85, -180], [85, 180]]
+});
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'© OpenStreetMap contributors',maxZoom:19
+  attribution:'© OpenStreetMap contributors', maxZoom:19
 }).addTo(map);
 
-// ── SEARCH ────────────────────────────────────────────────
-const searchInput=document.getElementById('search-input');
-const searchResults=document.getElementById('search-results');
-const searchBtn=document.getElementById('search-btn');
-
-function showResults(html){searchResults.innerHTML=html;searchResults.style.display='block';}
-function hideResults(){searchResults.style.display='none';searchResults.innerHTML='';}
-
-async function doSearch(q){
-  q=q.trim();
-  if(!q){hideResults();return;}
-  showResults('<div class="sr-loading">🌸 Searching…</div>');
-  try{
-    const url=`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6&addressdetails=1`;
-    const res=await fetch(url,{headers:{'Accept-Language':'en'}});
-    const data=await res.json();
-    if(!data.length){showResults('<div class="sr-none">No places found 🥺 Try a different name</div>');return;}
-    const html=data.map(p=>{
-      const name=p.display_name.split(',')[0];
-      const detail=p.display_name.split(',').slice(1,3).join(',').trim();
-      return `<div class="sr-item" data-lat="${p.lat}" data-lon="${p.lon}" data-name="${escHtml(p.display_name)}">
-        <span class="sr-item-icon">📍</span>
-        <div><div class="sr-item-name">${escHtml(name)}</div><div class="sr-item-detail">${escHtml(detail)}</div></div>
-      </div>`;
-    }).join('');
-    showResults(html);
-    document.querySelectorAll('.sr-item').forEach(el=>{
-      el.addEventListener('click',function(){
-        const lat=parseFloat(this.dataset.lat);
-        const lon=parseFloat(this.dataset.lon);
-        flyToPlace(lat,lon);
-        searchInput.value=this.querySelector('.sr-item-name').textContent;
-        hideResults();
-      });
-    });
-  }catch(e){showResults('<div class="sr-none">Search unavailable 🌷 Check your connection</div>');}
-}
-
-function flyToPlace(lat,lng){
-  map.flyTo([lat,lng],13,{duration:1.4});
-  if(searchCircle)map.removeLayer(searchCircle);
-  searchCircle=L.circle([lat,lng],{radius:300,color:'#e8547a',fillColor:'#f9d0dc',fillOpacity:0.25,weight:2}).addTo(map);
-  setTimeout(()=>{if(searchCircle)map.removeLayer(searchCircle);searchCircle=null;},4000);
-}
-
-searchBtn.addEventListener('click',()=>doSearch(searchInput.value));
-searchInput.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch(searchInput.value);});
-searchInput.addEventListener('input',function(){
-  clearTimeout(searchDebounce);
-  if(!this.value.trim()){hideResults();return;}
-  searchDebounce=setTimeout(()=>doSearch(this.value),400);
-});
-document.addEventListener('click',function(e){
-  if(!e.target.closest('#search-wrap'))hideResults();
-});
-
-// ── PINS ──────────────────────────────────────────────────
 function pinkIcon(active){
   return L.divIcon({
     className:'',
@@ -251,122 +334,215 @@ function pendingIcon(){
   });
 }
 
-map.on('click',function(e){
-  pendingLatLng=e.latlng;
-  if(tempMarker)map.removeLayer(tempMarker);
-  tempMarker=L.marker(e.latlng,{icon:pendingIcon()}).addTo(map);
-  document.getElementById('add-form').style.display='block';
-  document.getElementById('f-name').value='';
-  document.getElementById('f-story').value='';
-  document.getElementById('img-preview').style.display='none';
-  document.getElementById('img-preview').src='';
-  imgData=null;
-  document.getElementById('file-in').value='';
+/* ════════ AUTH STATE ════════ */
+onAuthStateChanged(auth, user => {
+  document.getElementById('loading-screen').style.display = 'none';
+  currentUser = user;
+
+  if (user) {
+    // hide auth, show app
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+        setTimeout(() => map.invalidateSize(), 100);
+
+    // populate user badge
+    document.getElementById('user-avatar').src = user.photoURL || '';
+    document.getElementById('user-name').textContent = user.displayName?.split(' ')[0] || 'You';
+    const isOwner = user.email === OWNER_EMAIL;
+    document.getElementById('sb-sub').textContent = isOwner
+      ? 'Click anywhere on the map to add a memory'
+      : 'Viewing — only the owner can add pins';
+  } else {
+    // hide app, show auth
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+});
+
+/* ════════ SIGN IN / OUT ════════ */
+document.getElementById('btn-google').addEventListener('click', async () => {
+  document.getElementById('auth-error').style.display = 'none';
+  try {
+    await signInWithPopup(auth, gProvider);
+  } catch(e) {
+    const el = document.getElementById('auth-error');
+    el.textContent = '😔 Sign-in failed — please try again.';
+    el.style.display = 'block';
+  }
+});
+document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+
+/* ════════ MAP CLICK ════════ */
+map.on('click', function(e) {
+  if (!currentUser || currentUser.email !== OWNER_EMAIL) return;
+  pendingLatLng = e.latlng;
+  if (tempMarker) map.removeLayer(tempMarker);
+  tempMarker = L.marker(e.latlng, {icon: pendingIcon()}).addTo(map);
+  const form = document.getElementById('add-form');
+  form.style.display = 'block';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-story').value = '';
+  document.getElementById('img-preview').style.display = 'none';
+  imgData = null;
+  document.getElementById('file-in').value = '';
   document.getElementById('f-name').focus();
 });
 
-document.getElementById('file-in').addEventListener('change',function(){
-  const file=this.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    imgData=e.target.result;
-    const prev=document.getElementById('img-preview');
-    prev.src=imgData;prev.style.display='block';
+/* ════════ PHOTO PICK ════════ */
+document.getElementById('file-in').addEventListener('change', function(){
+  const file = this.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imgData = e.target.result;
+    const prev = document.getElementById('img-preview');
+    prev.src = imgData; prev.style.display = 'block';
   };
   reader.readAsDataURL(file);
 });
 
-document.getElementById('btn-cancel').addEventListener('click',function(){
-  if(tempMarker)map.removeLayer(tempMarker);
-  tempMarker=null;pendingLatLng=null;
-  document.getElementById('add-form').style.display='none';
+/* ════════ CANCEL ════════ */
+document.getElementById('btn-cancel').addEventListener('click', () => {
+  if (tempMarker) map.removeLayer(tempMarker);
+  tempMarker = null; pendingLatLng = null;
+  document.getElementById('add-form').style.display = 'none';
 });
 
-document.getElementById('btn-save').addEventListener('click',function(){
-  const name=document.getElementById('f-name').value.trim();
-  if(!name){document.getElementById('f-name').focus();return;}
-  if(!pendingLatLng)return;
-  const story=document.getElementById('f-story').value.trim();
-  const dateStr=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  const pin={id:Date.now(),name,story,img:imgData,lat:pendingLatLng.lat,lng:pendingLatLng.lng,date:dateStr,marker:null,popup:null};
-  pins.push(pin);
-  if(tempMarker)map.removeLayer(tempMarker);
-  tempMarker=null;pendingLatLng=null;
-  addMarker(pin);renderList();
-  document.getElementById('add-form').style.display='none';
-  updateStats();
+/* ════════ SAVE PIN ════════ */
+document.getElementById('btn-save').addEventListener('click', async () => {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { document.getElementById('f-name').focus(); return; }
+  if (!pendingLatLng || !currentUser) return;
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.textContent = 'Saving… 🌸';
+  try {
+    await addDoc(collection(db, 'pins'), {
+      name,
+      story: document.getElementById('f-story').value.trim(),
+      img:   imgData || null,
+      lat:   pendingLatLng.lat,
+      lng:   pendingLatLng.lng,
+      date:  new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),
+      createdAt: serverTimestamp()
+    });
+    if (tempMarker) map.removeLayer(tempMarker);
+    tempMarker = null; pendingLatLng = null;
+    document.getElementById('add-form').style.display = 'none';
+  } catch(err) {
+    alert('Could not save — check your Firestore rules and OWNER_EMAIL.');
+    console.error(err);
+  }
+  btn.disabled = false; btn.textContent = 'Save Memory 🌸';
 });
 
-function addMarker(pin){
-  const marker=L.marker([pin.lat,pin.lng],{icon:pinkIcon(false)}).addTo(map);
-  const popupHtml=`<div>
-    ${pin.img?`<img src="${pin.img}" class="popup-img"/>`:`<div class="popup-img-placeholder">🌸</div>`}
+/* ════════ LIVE PINS ════════ */
+onSnapshot(collection(db, 'pins'), snapshot => {
+  snapshot.docChanges().forEach(change => {
+    const id = change.doc.id;
+    if (change.type === 'added')   addMarker(id, change.doc.data());
+    if (change.type === 'removed') { if (markerMap[id]) { map.removeLayer(markerMap[id]); delete markerMap[id]; } }
+  });
+  renderList(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
+  const n = snapshot.size;
+  document.getElementById('stats').textContent = `${n} memor${n===1?'y':'ies'}`;
+});
+
+function addMarker(id, pin) {
+  const marker = L.marker([pin.lat, pin.lng], {icon: pinkIcon(false)}).addTo(map);
+  const html = `<div>
+    ${pin.img ? `<img src="${pin.img}" class="popup-img"/>` : `<div class="popup-img-placeholder">🌸</div>`}
     <div class="popup-body">
-      <div class="popup-title">${escHtml(pin.name)}</div>
-      ${pin.story?`<div class="popup-story">${escHtml(pin.story)}</div>`:''}
+      <div class="popup-title">${esc(pin.name)}</div>
+      ${pin.story ? `<div class="popup-story">${esc(pin.story)}</div>` : ''}
       <div class="popup-date">📅 ${pin.date}</div>
     </div></div>`;
-  const popup=L.popup({className:'custom-popup',maxWidth:260}).setContent(popupHtml);
-  marker.bindPopup(popup);
-  marker.on('click',function(){setActivePin(pin);});
-  pin.marker=marker;pin.popup=popup;
+  marker.bindPopup(L.popup({className:'custom-popup', maxWidth:260}).setContent(html));
+  marker.on('click', () => setActiveCard(id));
+  markerMap[id] = marker;
 }
 
-function setActivePin(pin){
-  pins.forEach(p=>{if(p.marker)p.marker.setIcon(pinkIcon(false))});
-  if(pin.marker)pin.marker.setIcon(pinkIcon(true));
-  const card=document.querySelector(`.pin-card[data-id="${pin.id}"]`);
-  if(card){
+function setActiveCard(id) {
+  Object.entries(markerMap).forEach(([mid,m]) => m.setIcon(pinkIcon(mid===id)));
+  const card = document.querySelector(`.pin-card[data-id="${id}"]`);
+  if (card) {
     document.querySelectorAll('.pin-card').forEach(c=>c.classList.remove('active'));
     card.classList.add('active');
-    card.scrollIntoView({behavior:'smooth',block:'nearest'});
+    card.scrollIntoView({behavior:'smooth', block:'nearest'});
   }
 }
 
-function renderList(){
-  const list=document.getElementById('pin-list');
-  document.getElementById('empty').style.display=pins.length?'none':'block';
+function renderList(pins) {
+  const list = document.getElementById('pin-list');
+  document.getElementById('empty').style.display = pins.length ? 'none' : 'block';
   document.querySelectorAll('.pin-card').forEach(c=>c.remove());
-  pins.slice().reverse().forEach(pin=>{
-    const div=document.createElement('div');
-    div.className='pin-card';div.dataset.id=pin.id;
-    div.innerHTML=`
-      ${pin.img?`<img src="${pin.img}" class="pin-card-img"/>`:''}
+  const isOwner = currentUser && currentUser.email === OWNER_EMAIL;
+  [...pins].reverse().forEach(pin => {
+    const div = document.createElement('div');
+    div.className = 'pin-card'; div.dataset.id = pin.id;
+    div.innerHTML = `
+      ${pin.img ? `<img src="${pin.img}" class="pin-card-img"/>` : ''}
       <div class="pin-card-body">
-        <div class="pin-card-name">📍 ${escHtml(pin.name)}</div>
-        ${pin.story?`<div class="pin-card-story">${escHtml(pin.story)}</div>`:''}
+        <div class="pin-card-name">📍 ${esc(pin.name)}</div>
+        ${pin.story ? `<div class="pin-card-story">${esc(pin.story)}</div>` : ''}
         <div class="pin-card-date">${pin.date}</div>
       </div>
-      <button class="pin-del" data-id="${pin.id}" title="Delete">✕</button>`;
-    div.addEventListener('click',function(e){
-      if(e.target.classList.contains('pin-del'))return;
-      map.flyTo([pin.lat,pin.lng],12,{duration:1.2});
-      setTimeout(()=>{if(pin.marker)pin.marker.openPopup();},1300);
-      setActivePin(pin);
+      ${isOwner ? `<button class="pin-del" data-id="${pin.id}" title="Delete">✕</button>` : ''}`;
+    div.addEventListener('click', e => {
+      if (e.target.classList.contains('pin-del')) return;
+      const m = markerMap[pin.id];
+      if (m) { map.flyTo([pin.lat,pin.lng],12,{duration:1.2}); setTimeout(()=>m.openPopup(),1300); }
+      setActiveCard(pin.id);
     });
-    div.querySelector('.pin-del').addEventListener('click',function(e){
-      e.stopPropagation();deletePin(pin.id);
+    if (isOwner) div.querySelector('.pin-del')?.addEventListener('click', async e => {
+      e.stopPropagation();
+      if (confirm('Delete this memory? 🥺')) await deleteDoc(doc(db,'pins',pin.id));
     });
     list.appendChild(div);
   });
 }
 
-function deletePin(id){
-  const idx=pins.findIndex(p=>p.id===id);
-  if(idx===-1)return;
-  if(pins[idx].marker)map.removeLayer(pins[idx].marker);
-  pins.splice(idx,1);renderList();updateStats();
+/* ════════ SEARCH ════════ */
+const searchInput   = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+function showR(html){searchResults.innerHTML=html;searchResults.style.display='block';}
+function hideR(){searchResults.style.display='none';}
+async function doSearch(q){
+  q=q.trim(); if(!q){hideR();return;}
+  showR('<div class="sr-loading">🌸 Searching…</div>');
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6`,{headers:{'Accept-Language':'en'}});
+    const data=await res.json();
+    if(!data.length){showR('<div class="sr-none">No places found 🥺 Try a different name</div>');return;}
+    showR(data.map(p=>{
+      const name=p.display_name.split(',')[0];
+      const detail=p.display_name.split(',').slice(1,3).join(',').trim();
+      return `<div class="sr-item" data-lat="${p.lat}" data-lon="${p.lon}">
+        <span class="sr-item-icon">📍</span>
+        <div><div class="sr-item-name">${esc(name)}</div><div class="sr-item-detail">${esc(detail)}</div></div>
+      </div>`;
+    }).join(''));
+    document.querySelectorAll('.sr-item').forEach(el=>{
+      el.addEventListener('click',function(){
+        map.flyTo([+this.dataset.lat,+this.dataset.lon],13,{duration:1.4});
+        if(searchCircle)map.removeLayer(searchCircle);
+        searchCircle=L.circle([+this.dataset.lat,+this.dataset.lon],{radius:300,color:'#e8547a',fillColor:'#f9d0dc',fillOpacity:0.25,weight:2}).addTo(map);
+        setTimeout(()=>{if(searchCircle)map.removeLayer(searchCircle);searchCircle=null;},4000);
+        searchInput.value=this.querySelector('.sr-item-name').textContent;
+        hideR();
+      });
+    });
+  }catch{showR('<div class="sr-none">Search unavailable 🌷 Check your connection</div>');}
 }
+document.getElementById('search-btn').addEventListener('click',()=>doSearch(searchInput.value));
+searchInput.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch(searchInput.value);});
+searchInput.addEventListener('input',function(){
+  clearTimeout(searchDebounce);
+  if(!this.value.trim()){hideR();return;}
+  searchDebounce=setTimeout(()=>doSearch(this.value),400);
+});
+document.addEventListener('click',e=>{if(!e.target.closest('#search-wrap'))hideR();});
 
-function updateStats(){
-  document.getElementById('stats').textContent=`${pins.length} memor${pins.length===1?'y':'ies'}`;
-}
-
-function escHtml(s){
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-updateStats();
+/* ════════ UTILS ════════ */
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
 </body>
 </html>
