@@ -560,6 +560,17 @@ function pendingIcon(){
   });
 }
 
+
+document.addEventListener("DOMContentLoaded", function() {
+    function isInAppBrowser() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1) || (ua.indexOf("TikTok") > -1);
+    }
+
+    if (isInAppBrowser()) {
+        alert("Google Sign-In is not supported inside this app. Please tap the '...' menu and select 'Open in Browser'.");
+    }
+});
 /* ════════ AUTH STATE ════════ */
 onAuthStateChanged(auth, user => {
   document.getElementById('loading-screen').style.display = 'none';
